@@ -1,0 +1,142 @@
+/* =========================================================
+   Palette & tokens
+   Ivory paper, near-black ink, one muted clay accent.
+   Dark mode simply inverts paper and ink.
+   ========================================================= */
+:root {
+  --paper: #faf9f5;    /* page background */
+  --ink: #141413;      /* main text */
+  --ink-soft: #5e5d59; /* secondary text */
+  --accent: #d97757;   /* clay orange */
+
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #141413;
+    --ink: #faf9f5;
+    --ink-soft: #a3a29d;
+  }
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* =========================================================
+   Page: one calm column, vertically centered, lots of air
+   ========================================================= */
+.page {
+  min-height: 100vh;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 96px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sun {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+/* Strip default button styling from the sun (resting and bouncing) */
+.sun-button,
+.ball {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.sun-button {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 40px;
+  align-self: flex-start;
+  transition: transform 0.2s ease;
+}
+
+/* Small hint that it's clickable */
+.sun-button:hover {
+  transform: translateY(2px) rotate(-8deg);
+}
+
+.sun-button:focus-visible,
+.ball:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* The bouncing copy: pinned to the viewport, moved via transform from JS */
+.ball {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  will-change: transform;
+}
+
+/* Anything the ball can hit fades its color back after a flash */
+[data-collide] {
+  transition: color 0.3s ease;
+}
+
+[data-collide].hit {
+  color: var(--accent);
+  transition: none;
+}
+
+.name {
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 400;
+  /* Large optical size + a little softness: refined but still warm */
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0 0 24px;
+}
+
+/* Name on one line (wraps naturally on narrow screens) */
+.name-word {
+  display: inline-block;
+}
+
+.name-word + .name-word {
+  margin-left: 0.25em;
+}
+
+/* Letters stay individual boxes for the future pong game */
+.name-letter {
+  display: inline-block;
+}
+
+.lede {
+  font-size: 1.125rem;
+  color: var(--ink-soft);
+  max-width: 40ch;
+  margin: 0;
+}
