@@ -9,7 +9,8 @@
   --ink-soft: #5e5d59; /* secondary text */
   --accent: #d97757;   /* clay orange */
 
-  --font-serif: "Fraunces", Georgia, serif;
+  /* Literata only contains "J" (see index.html), so every other letter falls through to Fraunces */
+  --font-serif: "Literata", "Fraunces", Georgia, serif;
   --font-sans: "Inter", system-ui, sans-serif;
 }
 
@@ -84,6 +85,32 @@ body {
   transform: translateY(2px) rotate(-8deg);
 }
 
+/* Until first click: a short wiggle every few seconds, like it's itching to be launched.
+   Animates the inner SVG so it never fights the button's own hover/appear transforms. */
+.sun-button.jiggle .sun {
+  animation: jiggle 3.5s ease-in-out 1.2s infinite;
+}
+
+/* Hovering already shows it's clickable, so hold still */
+.sun-button.jiggle:hover .sun {
+  animation: none;
+}
+
+/* ~0.7s of wobble that dies down, then ~2.8s of rest */
+@keyframes jiggle {
+  0%, 20%, 100% { transform: rotate(0); }
+  4%  { transform: rotate(-14deg) translateY(-2px); }
+  8%  { transform: rotate(11deg); }
+  12% { transform: rotate(-7deg); }
+  16% { transform: rotate(3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sun-button.jiggle .sun {
+    animation: none;
+  }
+}
+
 .sun-button:focus-visible,
 .ball:focus-visible {
   outline: 2px solid var(--accent);
@@ -139,4 +166,18 @@ body {
   color: var(--ink-soft);
   max-width: 40ch;
   margin: 0;
+}
+
+/* Links: same ink as the text around them, with a quiet underline that warms on hover */
+a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--accent);
 }

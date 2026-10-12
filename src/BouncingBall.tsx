@@ -8,13 +8,14 @@ const MAX_DT = 1 / 30; // cap the timestep so a slow frame can't tunnel through 
 const HIT_FLASH_MS = 180;
 
 type Props = {
+  id: number;
   start: DOMRect; // where the icon was on screen when clicked
-  onStop: () => void;
+  onStop: (id: number) => void; // must be stable (useCallback) or the ball restarts
 };
 
 // The sun icon, detached from the page and moving under its own physics.
 // Position is written straight to the DOM each frame (no React re-renders).
-export default function BouncingBall({ start, onStop }: Props) {
+export default function BouncingBall({ id, start, onStop }: Props) {
   const ballRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -74,24 +75,21 @@ export default function BouncingBall({ start, onStop }: Props) {
     };
 
     frame = requestAnimationFrame(step);
-
-    // Escape also puts the sun back
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onStop();
-    window.addEventListener("keydown", onKey);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [start, onStop]);
+    return () => cancelAnimationFrame(frame);
+  }, [start]);
 
   return (
     <button
       ref={ballRef}
       className="ball"
-      style={{ width: start.width, height: start.height }}
-      onClick={onStop}
-      aria-label="Put the sun back"
+      style={{
+        width: start.width,
+        height: start.height,
+        // Start where the icon was, so there's no flash at the top-left before the first frame
+        transform: `translate(${start.left}px, ${start.top}px)`,
+      }}
+      onClick={() => onStop(id)}
+      aria-label="Remove this sun"
     >
       <Sun />
     </button>
