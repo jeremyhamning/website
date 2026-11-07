@@ -95,3 +95,14 @@ needed for deploys; remove it or restrict it to your IP.
 - Settings → Variables → Actions: `AWS_REGION`, `AWS_ROLE_ARN`, `EC2_INSTANCE_ID`.
 - After the first successful push, open the `website` package (your profile → Packages)
   and make sure it's linked to this repo and stays private.
+
+## TODO
+
+- [ ] **Move host patching to AWS SSM Patch Manager.** The instance currently patches itself
+  with Ubuntu's `unattended-upgrades`, with automatic reboots at 04:00 UTC
+  (`/etc/apt/apt.conf.d/52unattended-reboot`). Patch Manager would add a compliance
+  dashboard and AWS-side scheduling. Steps:
+  - Confirm Patch Manager supports this Ubuntu release (26.04 support may lag).
+  - Systems Manager → Quick Setup → Patch Manager → create a patch policy for this instance
+    (e.g. weekly, `AWS-UbuntuDefaultPatchBaseline`, reboot if needed).
+  - Disable unattended-upgrades' automatic installs so the two don't fight over the apt lock.
