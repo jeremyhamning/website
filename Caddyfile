@@ -1,0 +1,17 @@
+# To enable HTTPS, replace ":80" with your domain (e.g. "example.com").
+# Caddy will then fetch and renew a Let's Encrypt cert automatically.
+:80 {
+	root * /srv
+	encode zstd gzip
+
+	# Vite fingerprints everything in /assets, so it can be cached forever
+	header /assets/* Cache-Control "public, max-age=31536000, immutable"
+	# Everything else (index.html via "/" or SPA fallback) must be revalidated
+	# so new deploys show up immediately
+	@unhashed not path /assets/*
+	header @unhashed Cache-Control "no-cache"
+
+	# SPA fallback: unknown paths serve index.html
+	try_files {path} /index.html
+	file_server
+}

@@ -1,0 +1,18 @@
+# Lives at /opt/website/compose.yaml on the EC2 instance.
+# The deploy workflow sets IMAGE_TAG to the git SHA being deployed.
+services:
+  web:
+    image: ghcr.io/jeremyhamning/website:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3
+    volumes:
+      # Caddy stores TLS certs here; keep them across container restarts
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
