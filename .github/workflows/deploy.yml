@@ -65,7 +65,7 @@ jobs:
       id-token: write # lets the job exchange a GitHub OIDC token for AWS creds
     steps:
       - name: Configure AWS credentials (OIDC, no stored keys)
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}

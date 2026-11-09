@@ -1,6 +1,11 @@
-# To enable HTTPS, replace ":80" with your domain (e.g. "example.com").
-# Caddy will then fetch and renew a Let's Encrypt cert automatically.
-:80 {
+# Naming a real domain turns on automatic HTTPS: Caddy fetches and renews
+# Let's Encrypt certs (stored in the caddy_data volume) and redirects
+# http:// to https://. Requires DNS pointing here and ports 80 + 443 open.
+#
+# SITE_DOMAIN defaults to production. For local testing, run the container
+# with SITE_DOMAIN=localhost and Caddy uses a self-signed cert instead.
+
+{$SITE_DOMAIN:jeremyhamning.com} {
 	root * /srv
 	encode zstd gzip
 
@@ -14,4 +19,9 @@
 	# SPA fallback: unknown paths serve index.html
 	try_files {path} /index.html
 	file_server
+}
+
+# The bare domain is canonical; send www there, keeping the path
+www.{$SITE_DOMAIN:jeremyhamning.com} {
+	redir https://{$SITE_DOMAIN:jeremyhamning.com}{uri} permanent
 }

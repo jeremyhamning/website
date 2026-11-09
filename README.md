@@ -24,8 +24,10 @@ private GHCR as `ghcr.io/jeremyhamning/website:<git-sha>`, then tells the EC2 in
 (via AWS SSM, no SSH) to pull and restart it. See `.github/workflows/deploy.yml`.
 
 - **Roll back:** Actions → Deploy → Run workflow → enter a previous commit SHA as `tag`.
-- **Test locally:** `docker build -t website . && docker run --rm -p 8080:80 website`
-- **HTTPS:** point a domain at the instance, replace `:80` in `Caddyfile` with the domain, open 443.
+- **Test locally:** `docker build -t website . && docker run --rm -e SITE_DOMAIN=localhost -p 8443:443 website`,
+  then open https://localhost:8443 (self-signed cert, so accept the browser warning).
+- **HTTPS:** Caddy gets Let's Encrypt certs for `jeremyhamning.com` automatically and redirects
+  `www` to the bare domain. Needs DNS pointing at the Elastic IP and ports 80 + 443 open.
 
 ### One-time setup
 
@@ -60,12 +62,16 @@ The PAT is stored in `/root/.docker/config.json`. When it expires, deploys fail 
     "Condition": {
       "StringEquals": {
         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-        "token.actions.githubusercontent.com:sub": "repo:jeremyhamning/website:environment:production"
+        "token.actions.githubusercontent.com:sub": "repo:jeremyhamning@1897987/website@1414850072:environment:production"
       }
     }
   }]
 }
 ```
+
+  The `sub` uses GitHub's immutable subject format (`owner@ownerId/repo@repoId`), which this
+  repo has enabled. Check the current prefix with
+  `curl -s https://api.github.com/repos/jeremyhamning/website/actions/oidc/customization/sub`.
 
   and this permissions policy:
 
@@ -86,7 +92,7 @@ The PAT is stored in `/root/.docker/config.json`. When it expires, deploys fail 
 }
 ```
 
-**3. Security group:** inbound 80 (and 443 TCP+UDP once HTTPS is on). Port 22 isn't
+**3. Security group:** inbound 80 and 443 (TCP, plus UDP 443 for HTTP/3). Port 22 isn't
 needed for deploys; remove it or restrict it to your IP.
 
 **4. GitHub repo settings**
